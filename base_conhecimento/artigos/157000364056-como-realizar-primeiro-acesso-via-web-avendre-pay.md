@@ -11,22 +11,63 @@ videos: []
 
 # Como Realizar Primeiro Acesso via Web - Avendre Pay
 
-### Introducao
+### **Introdução**
 
-O processo de **login no Avendre Pay** garante que beneficiarios possam acessar a conta com seguranca e praticidade. Disponivel para todos os beneficiarios cadastrados.
+O **processo de** **login** no Avendre Pay garante que beneficiários possam acessar sua conta com segurança e praticidade.
 
-### Primeiro Acesso
+  
 
-No primeiro acesso voce faz login com usuario e senha e valida a identidade por **autenticacao de dois fatores (2FA)**.
 
-### Passo a Passo (Web)
+_Essa funcionalidade está disponível para todos os beneficiários cadastrados na plataforma._
 
-1. Acesse <https://ibk.pay.avendre.com.br> ou entre pela plataforma Avendre.
-2. Informe **CPF e senha** e clique em **"Entrar"**, ou use **"Acessar com Avendre ID"**.
-3. Voce sera redirecionado para a plataforma Avendre para preencher o login.
-4. Escolha o metodo de 2FA: **SMS** ou **E-mail**.
-5. Insira o **codigo de verificacao** recebido.
-6. Apos a validacao, voce vai para a tela inicial (Home).
+* * *
 
-Se tiver dificuldade, veja como recuperar a senha: [Como Recuperar a Senha via Web - Avendre Pay](https://ajuda.avendre.com.br/support/solutions/articles/157000364059).
+### **Primeiro Acesso**
 
+No **primeiro acesso** , você deverá fazer login com suas credenciais (usuário e senha) e validar sua identidade por meio da autenticação de dois fatores (2FA). Esse processo garante mais segurança para sua conta.
+
+  
+
+
+Abaixo vamos ver como **realizar o primeiro acesso via Web.**
+
+* * *
+
+### **Passo a Passo**
+
+1\. Acesse a plataforma web do Avendre Pay ou entre diretamente pela plataforma Avendre: [**https://ibk.pay.avendre.com.br**](<https://ibk.pay.avendre.com.br>)
+
+  
+
+
+2\. Na primeira tela, insira seu CPF e senha e clique em **“Entrar”** ou selecione a opção **“Acessar com Avendre ID”.**  
+Se o acesso for direto pela plataforma Avendre, você será encaminhado automaticamente para a etapa de autenticação.
+
+![](https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776188/original/1BqcV4hgie5sr-9uc6xP9VfPOyjmbaL5Sw.png?1752598563)  
+
+
+3\. Você será redirecionado para a plataforma do Avendre, onde deverá preencher suas informações de login.
+
+  
+
+
+4\. Após validar suas credenciais, escolha o método de **autenticação de dois fatores:****SMS** ou**E-mail.**
+
+**![](https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776212/original/-55sNqFND81QfZ9-90oLLUN0tiwdYNMjwA.png?1752598602)**  
+
+
+5\. Insira o código de verificação enviado por SMS ou E-mail, conforme o canal escolhido.
+
+![](https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776291/original/LBLpo6U7r9Q7_xiFsMZsYoyPBdxricHQfw.png?1752598671)
+
+  
+
+
+6\. Após a validação do código, você será direcionado automaticamente para a tela inicial da plataforma web (Home).
+
+![](https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776302/original/DEaOdwJFL4cV1tWY1AhHQozUPgtA5Pz4AA.png?1752598679)
+
+  
+
+
+Se tiver qualquer dificuldade no primeiro acesso, veja como recuperar sua senha: [**Como Recuperar a Senha via Web - Avendre Pay**](<https://ajuda.avendre.com.br/pt-BR/support/solutions/articles/157000364059>)

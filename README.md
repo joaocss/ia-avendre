@@ -30,13 +30,25 @@ ia-avendre/
 │   └── raspar_base.py          # raspa TODA a base oficial -> base_conhecimento/
 ├── rag/
 │   ├── construir_indice.py     # gera embeddings (OpenAI) -> indice_embeddings.json
-│   └── buscar.py               # busca semantica + fallback por palavra-chave
+│   └── buscar.py               # busca semantica + fallback por palavra-chave (local)
 ├── base_conhecimento/
 │   ├── artigos/*.md            # um markdown por artigo (com frontmatter)
 │   ├── manifesto.json          # indice de metadados de todos os artigos
 │   └── indice_embeddings.json  # vetores (gerado; fora do git)
+├── db/
+│   └── esquema.sql             # schema do Supabase (artigos/trechos/empresas/etc)
+├── scripts/
+│   └── migrar_para_supabase.py # migra os .md + embeddings para o Supabase
+├── api/                        # API FastAPI (multi-tenant, cache, metricas)
+│   ├── principal.py            # app FastAPI (rotas + /saude)
+│   ├── banco.py                # acesso ao Supabase (pool psycopg + pgvector)
+│   ├── busca.py                # normalizacao, chave de cache, montagem de resultado
+│   ├── esquemas.py             # modelos Pydantic
+│   ├── rotas_perguntas.py      # POST /perguntar
+│   └── rotas_admin.py          # GET /admin/metricas
 ├── skill/suporte-avendre/
-│   └── SKILL.md                # orquestra o pipeline (a "IA de suporte")
+│   └── SKILL.md                # orquestra o pipeline local (a "IA de suporte")
+├── Dockerfile, docker-compose.yml  # container da API (aponta pro Supabase remoto)
 ├── requisitos.txt
 └── README.md
 ```
@@ -77,6 +89,38 @@ python rag/buscar.py "como consultar meu extrato no avendre pay" --k 4 --json
 ### 5. Usar como IA de suporte
 A skill `skill/suporte-avendre/SKILL.md` orquestra tudo: recebe a pergunta, chama o
 `buscar.py`, e monta a resposta didatica com link, imagens e video.
+
+## Banco de dados (Supabase) + API (multi-tenant)
+
+Alem do fluxo local acima (arquivos + CLI), o projeto tambem tem uma API real que
+guarda a base de conhecimento e as metricas de uso num banco Postgres (Supabase),
+com cache de respostas e contagem por empresa/usuario.
+
+```bash
+# 1. rode db/esquema.sql no SQL editor do Supabase (cria as tabelas + extensao pgvector)
+
+# 2. defina OPENAI_API_KEY e DATABASE_URL no .env (ver .env.example)
+
+# 3. migre os artigos + embeddings para o Supabase
+python scripts/migrar_para_supabase.py
+
+# 4. suba a API em Docker
+docker compose up --build
+
+# 5. teste
+curl -X POST localhost:8000/perguntar \
+  -H "Content-Type: application/json" \
+  -d '{"empresa_nome":"Teste","usuario_email":"a@a.com","pergunta":"como troco minha senha do avendre pay"}'
+
+curl localhost:8000/admin/metricas
+```
+
+Notas:
+- `empresa_nome`/`usuario_email` sao apenas texto informado na chamada por enquanto —
+  ainda **nao ha SSO real** com Avendre/CV CRM (fica para uma proxima etapa).
+- `/admin/metricas` ainda **nao tem autenticacao** — e um endpoint interno.
+- O fluxo local (`rag/buscar.py` + skill) continua funcionando normalmente e
+  independente da API/Supabase.
 
 ## Estado atual (seed)
 A base ja vem com **5 artigos reais** de exemplo (extrato, primeiro acesso, login

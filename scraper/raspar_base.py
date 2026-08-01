@@ -23,6 +23,7 @@ import json
 import os
 import re
 import time
+import unicodedata
 from urllib.parse import urljoin
 
 import requests
@@ -105,6 +106,7 @@ def coletar_urls_de_artigos(pasta_id):
 def extrair_corpo(sopa):
     """Localiza o elemento com o corpo do artigo, testando seletores comuns do Freshdesk."""
     for seletor in [
+        "div.fw-content--single-article",
         "div.article-body", "#article-body", "article .article-body",
         "div.fw-article-content", "article", "div[itemprop='articleBody']",
     ]:
@@ -129,6 +131,10 @@ def raspar_artigo(url):
     corpo = extrair_corpo(sopa)
     if corpo is None:
         return None
+
+    # remove scripts/estilos embutidos no corpo (nao fazem parte do conteudo)
+    for lixo in corpo.find_all(["script", "style"]):
+        lixo.decompose()
 
     # imagens e videos ANTES de converter (para nao perder src)
     imagens = []
@@ -161,7 +167,9 @@ def raspar_artigo(url):
 
 
 def slugificar(texto):
-    texto = re.sub(r"[^\w\s-]", "", texto, flags=re.UNICODE).strip().lower()
+    # remove acentos (nomenclatura do projeto e sem acentos)
+    texto = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    texto = re.sub(r"[^\w\s-]", "", texto).strip().lower()
     texto = re.sub(r"[\s_-]+", "-", texto)
     return texto[:80]
 

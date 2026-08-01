@@ -19,6 +19,9 @@ import json
 import os
 import re
 
+from dotenv import load_dotenv
+load_dotenv()
+
 MODELO_EMBEDDING = "text-embedding-3-small"
 TAMANHO_CHUNK = 900          # caracteres por trecho (aprox.)
 SOBREPOSICAO = 150           # sobreposicao entre trechos

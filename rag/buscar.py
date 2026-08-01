@@ -24,6 +24,9 @@ import os
 import re
 import unicodedata
 
+from dotenv import load_dotenv
+load_dotenv()
+
 RAIZ = os.path.dirname(__file__)
 PASTA_BASE = os.path.join(RAIZ, "..", "base_conhecimento")
 PASTA_ARTIGOS = os.path.join(PASTA_BASE, "artigos")

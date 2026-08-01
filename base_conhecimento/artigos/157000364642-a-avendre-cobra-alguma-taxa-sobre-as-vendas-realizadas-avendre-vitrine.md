@@ -11,5 +11,4 @@ videos: []
 
 # A Avendre cobra alguma taxa sobre as vendas realizadas? - Avendre Vitrine
 
-**Nao.** A Avendre nao interfere nas comissoes nem nas negociacoes entre corretores e incorporadoras. A plataforma apenas facilita a conexao entre esses profissionais e oferece uma ferramenta eficiente para divulgar e vender imoveis primarios.
-
+Não. A Avendre não interfere nas comissões ou nas negociações entre corretores e incorporadoras. A plataforma apenas facilita a conexão entre esses profissionais e oferece uma ferramenta eficiente para divulgar e vender imóveis primários.

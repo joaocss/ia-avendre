@@ -20,14 +20,32 @@ Cobre 4 areas: **Avendre Vitrine**, **Gestao de Parcerias**, **Avendre Pay** e a
 - **Entrega como skill do Claude** (`skill/suporte-avendre/SKILL.md`) que orquestra o
   fluxo. A skill tambem esta instalada na conta do usuario (persiste entre sessoes).
 - **Embeddings OpenAI** `text-embedding-3-small` (semantico), com **fallback por
-  palavra-chave** (TF-IDF simples) que funciona offline/sem chave.
+  palavra-chave** (TF-IDF simples/full-text search) que funciona offline/sem chave.
 - **Scraping proprio** do portal Freshdesk (nao ha API publica autenticada).
+- **Dois fluxos paralelos** (ver detalhe abaixo): o local (arquivos + CLI, usado pela
+  skill) e o de banco de dados (Supabase + API FastAPI em Docker, multi-tenant, com
+  cache e metricas de uso). Nenhum dos dois depende do outro para funcionar.
 
-Fluxo:
+Fluxo local (CLI/skill):
 ```
 pergunta -> rag/buscar.py (semantico OU palavra-chave) -> artigos relevantes
         -> skill suporte-avendre monta resposta didatica multimodal + Fontes
 ```
+
+Fluxo de banco (API, multi-tenant):
+```
+scraper/raspar_base.py -> base_conhecimento/artigos/*.md
+        -> scripts/migrar_para_supabase.py -> Supabase (artigos/trechos + pgvector)
+                                                         |
+POST /perguntar (api/) -> cache_respostas (hit?) -> busca vetorial (pgvector)
+        -> grava metrica em `perguntas` (empresa_id/usuario_id) -> resposta
+GET /admin/metricas -> contagem de perguntas por empresa/usuario
+```
+- Tenant (`empresas`/`usuarios`) criado do zero no Supabase por enquanto (sem SSO real
+  com CV CRM/Avendre ainda); ha um campo `id_externo_cvcrm` reservado para o
+  mapeamento futuro.
+- Ver plano detalhado (schema, decisoes, verificacao) em
+  `C:\Users\JOAOSA\.claude\plans\refactored-drifting-shore.md`.
 
 ## Estrutura
 
@@ -35,36 +53,48 @@ pergunta -> rag/buscar.py (semantico OU palavra-chave) -> artigos relevantes
 ia-avendre/
 ├── CLAUDE.md                    # este arquivo
 ├── README.md                   # guia de uso
-├── requisitos.txt              # deps: openai, requests, beautifulsoup4, html2text
+├── requisitos.txt              # deps: openai, fastapi, psycopg, pgvector, etc.
+├── .env / .env.example          # OPENAI_API_KEY, DATABASE_URL, chaves Supabase (.env FORA do git)
 ├── .gitignore                  # ignora .env, chaves, indice_embeddings.json
 ├── scraper/
 │   └── raspar_base.py          # raspa TODA a base -> base_conhecimento/
 ├── rag/
-│   ├── construir_indice.py     # gera embeddings OpenAI -> indice_embeddings.json
+│   ├── construir_indice.py     # gera embeddings OpenAI -> indice_embeddings.json (local)
 │   └── buscar.py               # busca semantica + fallback palavra-chave (CLI --k --json)
 ├── base_conhecimento/
 │   ├── artigos/<id>-<slug>.md  # 1 markdown por artigo, com frontmatter (imagens/videos)
 │   ├── manifesto.json          # indice de metadados de todos os artigos
 │   └── indice_embeddings.json  # vetores (gerado; FORA do git)
+├── db/
+│   └── esquema.sql             # schema Supabase: empresas/usuarios/artigos/trechos/perguntas/cache_respostas
+├── scripts/
+│   └── migrar_para_supabase.py # migra base_conhecimento/*.md -> Supabase (idempotente)
+├── api/                        # API FastAPI multi-tenant (cache + metricas)
+│   ├── principal.py, banco.py, busca.py, esquemas.py
+│   ├── rotas_perguntas.py      # POST /perguntar
+│   └── rotas_admin.py          # GET /admin/metricas
+├── Dockerfile, docker-compose.yml, .dockerignore
 └── skill/suporte-avendre/
-    └── SKILL.md                # a "IA de suporte" (orquestra o pipeline)
+    └── SKILL.md                # a "IA de suporte" (orquestra o pipeline local)
 ```
 
 ## Comandos
 
 ```bash
-# 1. dependencias
+# --- fluxo local (CLI/skill) ---
 pip install -r requisitos.txt
-
-# 2. raspar toda a base (~120 artigos das 12 pastas). Teste: --limite 10
-python scraper/raspar_base.py
-
-# 3. gerar indice semantico (precisa da chave)
-set OPENAI_API_KEY=sk-...        # Windows  (Linux/Mac: export)
-python rag/construir_indice.py
-
-# 4. buscar
+python scraper/raspar_base.py                                            # ~120 artigos, 12 pastas
+python rag/construir_indice.py                                           # precisa OPENAI_API_KEY no .env
 python rag/buscar.py "como consultar meu extrato no avendre pay" --k 4 --json
+
+# --- fluxo de banco (API multi-tenant) ---
+# 1. rodar db/esquema.sql no SQL editor do Supabase
+# 2. definir DATABASE_URL no .env (ja tem OPENAI_API_KEY)
+python scripts/migrar_para_supabase.py
+docker compose up --build
+curl -X POST localhost:8000/perguntar -H "Content-Type: application/json" \
+  -d '{"empresa_nome":"Teste","usuario_email":"a@a.com","pergunta":"..."}'
+curl localhost:8000/admin/metricas
 ```
 
 ## Convencoes de codigo
@@ -76,14 +106,14 @@ python rag/buscar.py "como consultar meu extrato no avendre pay" --k 4 --json
 
 ## Estado atual
 
-- Pipeline **validado ponta a ponta** (busca por palavra-chave retornando o artigo
-  correto com imagens).
-- `base_conhecimento/` tem **5 artigos-seed reais** (extrato web, primeiro acesso web
-  Pay, login corretor, comissao/data, taxa de vendas) + `manifesto.json`.
-- **Pendente (rodar na maquina do usuario):**
-  1. `python scraper/raspar_base.py` para popular os ~120 artigos completos.
-  2. `python rag/construir_indice.py` para gerar o indice semantico
-     (a `api.openai.com` nao era alcancavel do ambiente anterior; na maquina do Joao e).
+- Fluxo local **validado ponta a ponta**: `base_conhecimento/` tem os **120 artigos
+  completos** (raspagem corrigida — os seletores CSS do scraper estavam desatualizados
+  e nao extraiam nenhum corpo; ver historico) + `manifesto.json` + indice semantico
+  (`indice_embeddings.json`, 377 trechos) gerado e testado com sucesso.
+- Fluxo de banco (Supabase + API): schema, script de migracao, API FastAPI e Docker
+  foram criados (ver plano em `C:\Users\JOAOSA\.claude\plans\refactored-drifting-shore.md`).
+  **Pendente**: aplicar `db/esquema.sql` no Supabase, rodar a migracao e testar a API
+  ponta a ponta (schema/migracao/Docker ja escritos, falta validar em execucao).
 
 ## Git (importante)
 
@@ -103,18 +133,26 @@ git push -u origin main
 
 ## Seguranca
 
-- **NUNCA** commitar `OPENAI_API_KEY`. Use variavel de ambiente ou `.env` (ignorado).
+- **NUNCA** commitar `OPENAI_API_KEY`, `DATABASE_URL` (tem a senha do Postgres) ou
+  qualquer chave. Tudo isso vive so no `.env` local (ignorado pelo git).
 - O `indice_embeddings.json` fica fora do git (`.gitignore`).
-- A chave usada nos primeiros testes foi compartilhada em chat e o repo e publico:
-  **rotacionar essa chave** na plataforma da OpenAI.
+- Chaves compartilhadas em chat/sessoes anteriores (OpenAI e a senha do Supabase)
+  ja foram expostas e devem ser **rotacionadas/resetadas** nos respectivos paineis
+  assim que possivel — reusar uma chave ja exposta em chat nao remove a exposicao.
+- `/admin/metricas` (na API) ainda **nao tem autenticacao** — nao expor publicamente
+  sem adicionar isso antes.
 
 ## Roadmap / proximos passos
 
-1. Rodar scraper completo + indice semantico.
+1. Aplicar `db/esquema.sql`, rodar `scripts/migrar_para_supabase.py` e validar a API
+   ponta a ponta (cache, metricas, busca vetorial) — ver plano salvo.
 2. Avaliar qualidade das respostas em perguntas reais; ajustar `TAMANHO_CHUNK`/`--k`.
-3. (Opcional) Cache do embedding da consulta e reindexacao incremental.
-4. (Opcional) Interface: CLI de chat ou pequeno app web sobre o `buscar.py`.
-5. Agendar re-scraping periodico para manter a base atualizada.
+3. Decidir hospedagem de producao do container da API (ainda em aberto).
+4. Ligar o fluxo da skill (`SKILL.md`) na API em vez do CLI local, quando a hospedagem
+   for decidida.
+5. Autenticacao real (SSO Avendre/CV CRM) para substituir `empresa_nome`/`usuario_email`
+   digitados, e proteger `/admin/metricas`.
+6. Agendar re-scraping periodico para manter a base atualizada.
 
 ## Referencia
 

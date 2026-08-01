@@ -3,6 +3,13 @@ openai>=1.30
 requests>=2.31
 beautifulsoup4>=4.12
 html2text>=2024.2.26
+python-dotenv>=1.0
+
+# API + banco (Supabase/Postgres)
+fastapi>=0.115
+uvicorn[standard]>=0.30
+psycopg[binary,pool]>=3.2
+pgvector>=0.3
 
 # Apenas em ambientes que saem por proxy SOCKS (ex.: sandbox). Na sua maquina normalmente NAO e necessario:
 # httpx[socks]
