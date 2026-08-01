@@ -11,6 +11,10 @@ uvicorn[standard]>=0.30
 psycopg[binary,pool]>=3.2
 pgvector>=0.3
 
+# Observabilidade (Datadog APM, opcional)
+ddtrace>=2.10
+datadog-api-client>=2.23
+
 # Apenas em ambientes que saem por proxy SOCKS (ex.: sandbox). Na sua maquina normalmente NAO e necessario:
 # httpx[socks]
 # socksio

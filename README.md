@@ -122,6 +122,21 @@ Notas:
 - O fluxo local (`rag/buscar.py` + skill) continua funcionando normalmente e
   independente da API/Supabase.
 
+## Observabilidade (Datadog, opcional)
+
+O `docker-compose.yml` ja tem um servico `datadog` (o Agent) ao lado da API, com APM
+(`ddtrace`) e coleta de logs/metricas de container prontos. Para ativar:
+
+1. Crie/entre na conta em https://app.datadoghq.com/signup/setup e escolha
+   **"Infraestrutura e aplicacoes de back-end"**.
+2. Pegue a API key em Organization Settings -> API Keys e coloque em `DD_API_KEY`
+   no `.env` (ver `.env.example`). Se sua conta for na regiao EU, ajuste tambem
+   `DD_SITE` no `docker-compose.yml` (padrao e `datadoghq.com`).
+3. `docker compose up --build -d` — o Agent sobe junto e passa a coletar
+   metricas de infraestrutura, logs (stdout da API) e traces (APM) automaticamente.
+4. Sem `DD_API_KEY`, o container `datadog` simplesmente nao inicia — a API continua
+   funcionando normalmente (o Datadog e opcional, nao uma dependencia obrigatoria).
+
 ## Estado atual (seed)
 A base ja vem com **5 artigos reais** de exemplo (extrato, primeiro acesso, login
 corretor, comissao e taxa), suficientes para testar o fluxo ponta a ponta. Rode o

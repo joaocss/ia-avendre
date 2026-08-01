@@ -10,9 +10,12 @@ pendencia de proteger isso antes de expor publicamente.
 from fastapi import APIRouter
 
 from .banco import obter_pool
+from .datadog_cliente import consultar_serie
 from .esquemas import MetricasSaida
 
 roteador = APIRouter()
+
+NOME_CONTAINER_API = "avendre-api-1"
 
 
 @roteador.get("/admin/metricas", response_model=MetricasSaida)
@@ -49,3 +52,13 @@ def metricas():
             ]
 
     return {"por_empresa": por_empresa, "por_usuario": por_usuario}
+
+
+@roteador.get("/admin/metricas-infra")
+def metricas_infra(minutos: int = 15):
+    """Metricas de infraestrutura do container da API, via Datadog (CPU/memoria)."""
+    filtro = f"{{container_name:{NOME_CONTAINER_API}}}"
+    return {
+        "cpu": consultar_serie(f"avg:docker.cpu.usage{filtro}", minutos),
+        "memoria_rss": consultar_serie(f"avg:docker.mem.rss{filtro}", minutos),
+    }
