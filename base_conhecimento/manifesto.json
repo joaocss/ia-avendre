@@ -1,0 +1,83 @@
+[
+  {
+    "id": "157000364052",
+    "titulo": "Como Consultar Extrato via Web - Avendre Pay",
+    "categoria": "Avendre Pay",
+    "produto": "avendre_pay",
+    "pasta": "Extratos",
+    "url": "https://ajuda.avendre.com.br/support/solutions/articles/157000364052-como-consultar-extrato-via-web-avendre-pay",
+    "arquivo": "artigos/157000364052-como-consultar-extrato-via-web-avendre-pay.md",
+    "resumo": "Introducao A funcionalidade de consulta de extrato permite que usuarios autenticados acompanhem, de forma simples e intuitiva, o historico completo de movimentacoes financeiras da conta incluindo entradas e saidas. A visualizacao pode ser filtrada por periodo, tipo de transacao",
+    "imagens": [
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008773792/original/pt5vYozKeVHdnRMrm98klEyYlZD8VarbBQ.png?1752596536",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008773870/original/3UiIdjc-cs0H0jw7mJ34EYjcSqMQmQohwA.png?1752596620",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008773876/original/AMIH9bJmlFUuOxj9B9cya0p482BHWo3gdg.png?1752596624",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008773969/original/sXbYQ-oV7pzWWpftBG4ySh4e8w9VHITh_g.png?1752596718",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008774048/original/VYwAf9FNLA9azG1bUsVHN5kq1OPdj14o1A.png?1752596767",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008774112/original/vfJ9HfoFi3lPJoYqD5ntvJyF73NGPzOcBA.png?1752596821"
+    ],
+    "videos": []
+  },
+  {
+    "id": "157000364056",
+    "titulo": "Como Realizar Primeiro Acesso via Web - Avendre Pay",
+    "categoria": "Avendre Pay",
+    "produto": "avendre_pay",
+    "pasta": "Login",
+    "url": "https://ajuda.avendre.com.br/support/solutions/articles/157000364056-como-realizar-primeiro-acesso-via-web-avendre-pay",
+    "arquivo": "artigos/157000364056-como-realizar-primeiro-acesso-via-web-avendre-pay.md",
+    "resumo": "Introducao O processo de login no Avendre Pay garante que beneficiarios possam acessar a conta com seguranca e praticidade. Disponivel para todos os beneficiarios cadastrados. Primeiro Acesso No primeiro acesso voce faz login com usuario e senha e valida a identidade por autenti",
+    "imagens": [
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776188/original/1BqcV4hgie5sr-9uc6xP9VfPOyjmbaL5Sw.png?1752598563",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776212/original/-55sNqFND81QfZ9-90oLLUN0tiwdYNMjwA.png?1752598602",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776291/original/LBLpo6U7r9Q7_xiFsMZsYoyPBdxricHQfw.png?1752598671",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157008776302/original/DEaOdwJFL4cV1tWY1AhHQozUPgtA5Pz4AA.png?1752598679"
+    ],
+    "videos": []
+  },
+  {
+    "id": "157000365053",
+    "titulo": "Como Fazer Login na Avendre como Corretor - Avendre Vitrine",
+    "categoria": "Avendre | Vitrine",
+    "produto": "vitrine",
+    "pasta": "Duvidas de Acessos",
+    "url": "https://ajuda.avendre.com.br/support/solutions/articles/157000365053-como-fazer-login-na-avendre-como-corretor-avendre-vitrine",
+    "arquivo": "artigos/157000365053-como-fazer-login-na-avendre-como-corretor-avendre-vitrine.md",
+    "resumo": "Passo a passo para fazer login (Corretor) 1. Acesse o site oficial: abra o navegador e digite www.avendre.com.br , pressione Enter. 2. Localize a area de login: quando o site carregar, clique em \"Corretor\" . 3. Insira suas credenciais: E mail: o endereco cadastrado no Avendre. S",
+    "imagens": [
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157009524481/original/EOZ6lZcTkb6T1oovnMdlltpp2_qTfSnvTg.png?1753898801",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157009524537/original/fwI6_1z2KFQ4BlXBwxUyFdn5a40zX5lWGg.png?1753898859",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157009524585/original/1vPq5pN0HOAUDauUSqGTJA3yGO1xnBr0pA.png?1753898902",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157009524612/original/2ME9RBUP_T5CjwQRRb-NJUTkFJ2xzE0QzQ.png?1753898930"
+    ],
+    "videos": []
+  },
+  {
+    "id": "157000372478",
+    "titulo": "[Comissao] Como vejo a data em que o valor de comissao entrara na minha conta?",
+    "categoria": "Duvidas Frequentes",
+    "produto": "faq",
+    "pasta": "FAQ - Avendre Pay",
+    "url": "https://ajuda.avendre.com.br/support/solutions/articles/157000372478--comiss%C3%A3o-como-vejo-a-data-em-que-o-valor-de-comiss%C3%A3o-entrar%C3%A1-na-minha-conta-",
+    "arquivo": "artigos/157000372478-comissao-como-vejo-a-data-em-que-o-valor-de-comissao-entrara-na-minha-conta.md",
+    "resumo": "Para ver a data de entrada do valor de comissao na conta: 1. Acesse a secao Comissoes no menu lateral do Avendre Pay. 2. Localize a comissao que deseja consultar e clique no local indicado. 3. Sera aberto um pop up onde a informacao (data prevista) sera exibida.",
+    "imagens": [
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157020687888/original/msv1xKxlKQ1xQDAgqnNfy4ezb2_nCY9-BA.png?1773341413",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157020687893/original/_bH6FULV--5ZCJUK7XayrlVmYX4SD8eezQ.png?1773341420",
+      "https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/157020687901/original/Ov9FPcr2EaGEenM-PCWYmOJPE9Pi-eHyZw.png?1773341428"
+    ],
+    "videos": []
+  },
+  {
+    "id": "157000364642",
+    "titulo": "A Avendre cobra alguma taxa sobre as vendas realizadas? - Avendre Vitrine",
+    "categoria": "Duvidas Frequentes",
+    "produto": "faq",
+    "pasta": "FAQ - Avendre Vitrine",
+    "url": "https://ajuda.avendre.com.br/support/solutions/articles/157000364642-a-avendre-cobra-alguma-taxa-sobre-as-vendas-realizadas-avendre-vitrine",
+    "arquivo": "artigos/157000364642-a-avendre-cobra-alguma-taxa-sobre-as-vendas-realizadas-avendre-vitrine.md",
+    "resumo": "Nao. A Avendre nao interfere nas comissoes nem nas negociacoes entre corretores e incorporadoras. A plataforma apenas facilita a conexao entre esses profissionais e oferece uma ferramenta eficiente para divulgar e vender imoveis primarios.",
+    "imagens": [],
+    "videos": []
+  }
+]

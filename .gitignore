@@ -1,0 +1,14 @@
+# Segredos - NUNCA comitar chaves
+.env
+*.key
+segredos*
+**/segredos*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Indice de embeddings (grande; gerado por construir_indice.py)
+base_conhecimento/indice_embeddings.json

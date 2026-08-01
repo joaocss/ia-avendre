@@ -1,0 +1,9 @@
+# Dependencias do projeto IA Avendre
+openai>=1.30
+requests>=2.31
+beautifulsoup4>=4.12
+html2text>=2024.2.26
+
+# Apenas em ambientes que saem por proxy SOCKS (ex.: sandbox). Na sua maquina normalmente NAO e necessario:
+# httpx[socks]
+# socksio
