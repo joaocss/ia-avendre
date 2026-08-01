@@ -52,10 +52,12 @@ create table if not exists trechos (
     unique (artigo_id, n_trecho)
 );
 
--- lists baixo pois a base tem poucas centenas de trechos hoje; aumentar conforme crescer
-create index if not exists trechos_embedding_idx
-    on trechos using ivfflat (embedding vector_cosine_ops)
-    with (lists = 10);
+-- SEM indice aproximado (ivfflat/hnsw) de proposito: com poucas centenas de
+-- trechos, a busca exata (sem indice) e rapida e sempre correta. Um ivfflat
+-- com "lists" alto para um dataset pequeno faz o Postgres pesquisar so uma
+-- fracao dos dados (probes=1 por padrao) e retornar vizinhos errados - foi
+-- exatamente o bug observado ao testar a API. So adicionar um indice
+-- aproximado quando a base crescer para dezenas de milhares de trechos.
 
 -- ---------- metricas + cache ----------
 

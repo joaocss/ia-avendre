@@ -16,6 +16,7 @@ from .banco import (
 )
 from .busca import chave_cache, gerar_embedding_pergunta, montar_resultados
 from .esquemas import PerguntaEntrada, PerguntaSaida
+from .gerar_resposta import gerar_explicacao
 
 roteador = APIRouter()
 
@@ -56,11 +57,13 @@ def perguntar(entrada: PerguntaEntrada):
                 conexao.rollback()  # a excecao pode ter deixado a transacao abortada
                 linhas = buscar_trechos_palavra_chave(cursor, entrada.pergunta, entrada.k * 3)
 
+            resultados = montar_resultados(linhas, entrada.k)
             saida = {
                 "pergunta": entrada.pergunta,
                 "metodo": metodo,
                 "veio_do_cache": False,
-                "resultados": montar_resultados(linhas, entrada.k),
+                "explicacao": gerar_explicacao(entrada.pergunta, resultados),
+                "resultados": resultados,
             }
 
             gravar_cache(cursor, chave, saida)

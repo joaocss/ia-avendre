@@ -27,6 +27,17 @@ def gerar_embedding_pergunta(cliente, pergunta: str, modelo: str):
     return cliente.embeddings.create(model=modelo, input=[pergunta]).data[0].embedding
 
 
+def limpar_trecho(texto: str, limite: int = 600) -> str:
+    """Remove markdown de imagem/link antes de truncar (evita cortar no meio de uma URL)."""
+    texto = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", texto)
+    texto = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", texto)
+    # sobra de uma tag de imagem cortada no limite do chunk anterior (ex.:
+    # ".../arquivo.png?123)" sem o "![](" correspondente, que ficou no chunk de tras)
+    texto = re.sub(r"^[^\s()]*\)", "", texto)
+    texto = re.sub(r"\n{2,}", "\n\n", texto).strip()
+    return texto[:limite]
+
+
 def montar_resultados(linhas, k: int):
     """Converte as linhas do banco (banco.buscar_trechos_*) em resultados deduplicados por artigo."""
     resultados = []
@@ -41,7 +52,7 @@ def montar_resultados(linhas, k: int):
             "pasta": pasta,
             "url": url,
             "score": round(float(score), 4),
-            "trecho": trecho[:600],
+            "trecho": limpar_trecho(trecho),
             "imagens": imagens or [],
             "videos": videos or [],
         })

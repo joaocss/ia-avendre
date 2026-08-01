@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>Suporte Avendre (teste)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --roxo: #5b2a86;
+    --roxo-claro: #7c4dab;
+    --fundo: #f4f2f8;
+    --texto: #24202b;
+    --card: #ffffff;
+    --borda: #e2ddec;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .app { width: 100%; max-width: 720px; }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  header .logo {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--roxo), var(--roxo-claro));
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 20px; margin: 0; }
+  header p { margin: 2px 0 0; font-size: 13px; color: #6b6575; }
+
+  form {
+    background: var(--card);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    padding: 20px;
+    display: grid;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  label { font-size: 13px; font-weight: 600; color: #4a4553; }
+  input, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .linha-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  button {
+    background: var(--roxo);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: var(--roxo-claro); }
+  button:disabled { opacity: .6; cursor: default; }
+
+  #resultado { margin-top: 24px; display: grid; gap: 20px; }
+  .aviso { font-size: 13px; color: #6b6575; text-align: center; padding: 20px; }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #ece6f7;
+    color: var(--roxo);
+  }
+
+  /* explicacao gerada pela IA - card em destaque */
+  .explicacao {
+    background: linear-gradient(180deg, #f4effb, #ffffff);
+    border: 1px solid #d9cdf0;
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+  .explicacao .rotulo {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: var(--roxo);
+    text-transform: uppercase; letter-spacing: .04em;
+    margin-bottom: 10px;
+  }
+  .explicacao-corpo { font-size: 15px; line-height: 1.65; }
+  .explicacao-corpo p { margin: 0 0 10px; }
+  .explicacao-corpo ol, .explicacao-corpo ul { margin: 0 0 10px; padding-left: 22px; }
+  .explicacao-corpo li { margin-bottom: 4px; }
+  .explicacao-corpo strong { color: var(--roxo); }
+
+  /* secao de fontes - artigos originais, mais discreta */
+  .fontes-titulo {
+    font-size: 12px; font-weight: 700; color: #8a8494;
+    text-transform: uppercase; letter-spacing: .04em;
+    margin: 4px 2px;
+  }
+  .artigo {
+    background: var(--card);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 10px;
+  }
+  .artigo h3 { margin: 8px 0 4px; font-size: 15px; }
+  .artigo .meta { font-size: 12px; color: #8a8494; margin-bottom: 8px; }
+  .artigo p.trecho { font-size: 13px; line-height: 1.5; color: #4a4553; }
+  .artigo a { color: var(--roxo); font-weight: 600; text-decoration: none; font-size: 13px; }
+  .imagens { display: flex; gap: 8px; overflow-x: auto; margin-top: 8px; }
+  .imagens img {
+    max-height: 130px; width: auto; flex-shrink: 0;
+    border-radius: 8px; border: 1px solid var(--borda);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo"></div>
+    <div>
+      <h1>Suporte Avendre (pagina de teste)</h1>
+      <p>Consulta direta ao endpoint /perguntar - nao e a interface final</p>
+    </div>
+  </header>
+
+  <form id="form-pergunta">
+    <div>
+      <label for="pergunta">Sua pergunta</label>
+      <textarea id="pergunta" rows="2" placeholder="Ex.: como troco minha senha do Avendre Pay?" required></textarea>
+    </div>
+    <div class="linha-dupla">
+      <div>
+        <label for="empresa">Empresa</label>
+        <input id="empresa" placeholder="Ex.: Imobiliaria Teste" value="Teste manual" required>
+      </div>
+      <div>
+        <label for="email">Seu e-mail</label>
+        <input id="email" type="email" placeholder="voce@empresa.com" value="teste@avendre.com">
+      </div>
+    </div>
+    <button type="submit" id="botao-enviar">Perguntar</button>
+  </form>
+
+  <div id="resultado"></div>
+</div>
+
+<script>
+const form = document.getElementById('form-pergunta');
+const resultadoEl = document.getElementById('resultado');
+const botao = document.getElementById('botao-enviar');
+
+function escaparHtml(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+
+// limpa a sintaxe markdown do trecho literal do artigo (as imagens ja sao
+// mostradas separadamente na galeria, entao aqui so tiramos o "ruido")
+function limparTrecho(texto) {
+  return escaparHtml(texto)
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')       // remove imagens markdown
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')     // remove links, mantem o texto
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n{2,}/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .trim();
+}
+
+// renderizacao simples do markdown que o modelo gera na explicacao (paragrafos,
+// negrito e listas numeradas/com marcadores)
+function renderizarMarkdownSimples(texto) {
+  const linhas = escaparHtml(texto).split('\n');
+  let html = '';
+  let dentroDeLista = null; // 'ol' | 'ul' | null
+
+  const fecharLista = () => {
+    if (dentroDeLista) { html += `</${dentroDeLista}>`; dentroDeLista = null; }
+  };
+
+  for (let linha of linhas) {
+    linha = linha.trim();
+    const itemNumerado = linha.match(/^\d+[.\)]\s+(.*)/);
+    const itemComMarcador = linha.match(/^[-*]\s+(.*)/);
+
+    if (itemNumerado) {
+      if (dentroDeLista !== 'ol') { fecharLista(); html += '<ol>'; dentroDeLista = 'ol'; }
+      html += `<li>${itemNumerado[1]}</li>`;
+    } else if (itemComMarcador) {
+      if (dentroDeLista !== 'ul') { fecharLista(); html += '<ul>'; dentroDeLista = 'ul'; }
+      html += `<li>${itemComMarcador[1]}</li>`;
+    } else if (linha === '') {
+      fecharLista();
+    } else {
+      fecharLista();
+      html += `<p>${linha}</p>`;
+    }
+  }
+  fecharLista();
+  return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
+
+function renderizarResultados(dados) {
+  resultadoEl.innerHTML = '';
+
+  const cabecalho = document.createElement('div');
+  cabecalho.className = 'aviso';
+  cabecalho.innerHTML = `metodo: <span class="badge">${dados.metodo}</span> ${dados.veio_do_cache ? '<span class="badge">cache</span>' : ''}`;
+  resultadoEl.appendChild(cabecalho);
+
+  if (dados.explicacao) {
+    const explicacao = document.createElement('div');
+    explicacao.className = 'explicacao';
+    explicacao.innerHTML = `
+      <div class="rotulo">Resposta da IA de suporte</div>
+      <div class="explicacao-corpo">${renderizarMarkdownSimples(dados.explicacao)}</div>
+    `;
+    resultadoEl.appendChild(explicacao);
+  }
+
+  if (!dados.resultados.length) {
+    const vazio = document.createElement('div');
+    vazio.className = 'aviso';
+    vazio.textContent = 'Nao encontramos nenhum artigo relevante para essa pergunta na base.';
+    resultadoEl.appendChild(vazio);
+    return;
+  }
+
+  const tituloFontes = document.createElement('div');
+  tituloFontes.className = 'fontes-titulo';
+  tituloFontes.textContent = 'Fontes (artigos originais)';
+  resultadoEl.appendChild(tituloFontes);
+
+  for (const r of dados.resultados) {
+    const card = document.createElement('div');
+    card.className = 'artigo';
+
+    const imagensHtml = (r.imagens || []).slice(0, 4).map(
+      src => `<img src="${src}" alt="tela ilustrativa">`
+    ).join('');
+
+    card.innerHTML = `
+      <span class="badge">${escaparHtml(r.categoria)} / ${escaparHtml(r.pasta)}</span>
+      <h3>${escaparHtml(r.titulo)}</h3>
+      <div class="meta">score: ${r.score}</div>
+      <p class="trecho">${limparTrecho(r.trecho)}</p>
+      ${imagensHtml ? `<div class="imagens">${imagensHtml}</div>` : ''}
+      <p><a href="${r.url}" target="_blank" rel="noopener">Ver artigo completo &rarr;</a></p>
+    `;
+    resultadoEl.appendChild(card);
+  }
+}
+
+form.addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  botao.disabled = true;
+  botao.textContent = 'Perguntando...';
+  resultadoEl.innerHTML = '<div class="aviso">Buscando na base de conhecimento e gerando a explicacao...</div>';
+
+  try {
+    const resposta = await fetch('/perguntar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pergunta: document.getElementById('pergunta').value,
+        empresa_nome: document.getElementById('empresa').value,
+        usuario_email: document.getElementById('email').value || null,
+        k: 4,
+      }),
+    });
+
+    if (!resposta.ok) {
+      throw new Error('A API respondeu com erro (' + resposta.status + ')');
+    }
+
+    const dados = await resposta.json();
+    renderizarResultados(dados);
+  } catch (erro) {
+    resultadoEl.innerHTML = `<div class="aviso">Erro ao consultar a API: ${escaparHtml(erro.message)}</div>`;
+  } finally {
+    botao.disabled = false;
+    botao.textContent = 'Perguntar';
+  }
+});
+</script>
+</body>
+</html>

@@ -29,6 +29,7 @@ class PerguntaSaida(BaseModel):
     pergunta: str
     metodo: str
     veio_do_cache: bool
+    explicacao: Optional[str] = None
     resultados: list[ResultadoArtigo]
 
 
