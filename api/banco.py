@@ -58,14 +58,94 @@ def gravar_cache(cursor, chave: str, resposta: dict) -> None:
     )
 
 
-def gravar_pergunta(cursor, empresa_id, usuario_id, pergunta: str, metodo: str, veio_do_cache: bool) -> None:
+def gravar_pergunta(
+    cursor, empresa_id, usuario_id, pergunta: str, metodo: str, veio_do_cache: bool, sem_resposta: bool = False
+) -> int:
     cursor.execute(
         """
-        insert into perguntas (empresa_id, usuario_id, pergunta, metodo, veio_do_cache)
-        values (%s, %s, %s, %s, %s)
+        insert into perguntas (empresa_id, usuario_id, pergunta, metodo, veio_do_cache, sem_resposta)
+        values (%s, %s, %s, %s, %s, %s)
+        returning id
         """,
-        (empresa_id, usuario_id, pergunta, metodo, veio_do_cache),
+        (empresa_id, usuario_id, pergunta, metodo, veio_do_cache, sem_resposta),
     )
+    return cursor.fetchone()[0]
+
+
+def gravar_feedback(cursor, pergunta_id: int, util: bool) -> bool:
+    """Grava o feedback (util/nao_util) de uma interacao. Retorna False se o id nao existir."""
+    cursor.execute(
+        "update perguntas set feedback = %s where id = %s",
+        ("util" if util else "nao_util", pergunta_id),
+    )
+    return cursor.rowcount > 0
+
+
+def buscar_artigo_completo(cursor, artigo_id: str):
+    """Busca o artigo inteiro (para renderizar como no portal, nao so um trecho)."""
+    cursor.execute(
+        "select titulo, categoria, pasta, url, conteudo_markdown, imagens, videos from artigos where id = %s",
+        (artigo_id,),
+    )
+    linha = cursor.fetchone()
+    if not linha:
+        return None
+    titulo, categoria, pasta, url, conteudo_markdown, imagens, videos = linha
+    return {
+        "titulo": titulo,
+        "categoria": categoria,
+        "pasta": pasta,
+        "url": url,
+        "conteudo_markdown": conteudo_markdown,
+        "imagens": imagens or [],
+        "videos": videos or [],
+    }
+
+
+def obter_metricas_satisfacao(cursor):
+    """Agregados para o admin: quanto a IA resolveu sozinha, feedback e o que ficou sem resposta."""
+    cursor.execute("select count(*) from perguntas")
+    total = cursor.fetchone()[0]
+
+    cursor.execute("select count(*) from perguntas where sem_resposta")
+    sem_resposta_count = cursor.fetchone()[0]
+
+    cursor.execute("select count(*) from perguntas where escalonado_humano")
+    escalonadas = cursor.fetchone()[0]
+
+    cursor.execute("select count(*) from perguntas where feedback = 'util'")
+    feedback_positivo = cursor.fetchone()[0]
+
+    cursor.execute("select count(*) from perguntas where feedback = 'nao_util'")
+    feedback_negativo = cursor.fetchone()[0]
+
+    sem_feedback = total - feedback_positivo - feedback_negativo
+
+    cursor.execute(
+        """
+        select p.pergunta, e.nome, p.criado_em
+        from perguntas p
+        left join empresas e on e.id = p.empresa_id
+        where p.sem_resposta
+        order by p.criado_em desc
+        limit 50
+        """
+    )
+    perguntas_sem_resposta_recentes = [
+        {"pergunta": pergunta, "empresa": empresa, "criado_em": criado_em.isoformat()}
+        for pergunta, empresa, criado_em in cursor.fetchall()
+    ]
+
+    return {
+        "total_perguntas": total,
+        "resolvidas_pela_ia": total - sem_resposta_count - escalonadas,
+        "escalonadas_para_humano": escalonadas,
+        "sem_resposta_count": sem_resposta_count,
+        "feedback_positivo": feedback_positivo,
+        "feedback_negativo": feedback_negativo,
+        "sem_feedback": sem_feedback,
+        "perguntas_sem_resposta_recentes": perguntas_sem_resposta_recentes,
+    }
 
 
 def buscar_trechos_similares(cursor, embedding, k: int):

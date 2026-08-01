@@ -74,6 +74,14 @@ create table if not exists perguntas (
 create index if not exists perguntas_empresa_idx on perguntas(empresa_id);
 create index if not exists perguntas_usuario_idx on perguntas(usuario_id);
 
+-- feedback do usuario (util/nao util), flag de "sem resposta satisfatoria" (para a
+-- gestao saber que conteudo falta produzir) e reserva para o futuro handoff humano
+alter table perguntas add column if not exists feedback text null;
+alter table perguntas drop constraint if exists perguntas_feedback_check;
+alter table perguntas add constraint perguntas_feedback_check check (feedback in ('util', 'nao_util'));
+alter table perguntas add column if not exists sem_resposta boolean not null default false;
+alter table perguntas add column if not exists escalonado_humano boolean not null default false;
+
 create table if not exists cache_respostas (
     chave text primary key,  -- sha256(pergunta normalizada + k)
     resposta jsonb not null,

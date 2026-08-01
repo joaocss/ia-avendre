@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 """Rota POST /perguntar: busca (cache -> vetorial -> palavra-chave), registra metricas."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from .banco import (
+    buscar_artigo_completo,
     buscar_trechos_palavra_chave,
     buscar_trechos_similares,
     gravar_cache,
+    gravar_feedback,
     gravar_pergunta,
     ler_cache,
     obter_ou_criar_empresa,
@@ -15,12 +17,21 @@ from .banco import (
     obter_pool,
 )
 from .busca import chave_cache, gerar_embedding_pergunta, montar_resultados
-from .esquemas import PerguntaEntrada, PerguntaSaida
+from .esquemas import FeedbackEntrada, PerguntaEntrada, PerguntaSaida
 from .gerar_resposta import gerar_explicacao
 
 roteador = APIRouter()
 
 MODELO_EMBEDDING = "text-embedding-3-small"
+LIMIAR_RELEVANCIA = 0.55  # score minimo (busca semantica) para considerar a resposta satisfatoria
+
+
+def calcular_sem_resposta(metodo: str, resultados: list) -> bool:
+    if not resultados:
+        return True
+    if metodo == "semantica":
+        return resultados[0]["score"] < LIMIAR_RELEVANCIA
+    return False  # ts_rank (palavra-chave) nao e comparavel a esse limiar
 
 
 @roteador.post("/perguntar", response_model=PerguntaSaida)
@@ -38,12 +49,15 @@ def perguntar(entrada: PerguntaEntrada):
 
             resposta_cache = ler_cache(cursor, chave)
             if resposta_cache is not None:
-                gravar_pergunta(
+                sem_resposta = calcular_sem_resposta(
+                    resposta_cache.get("metodo", ""), resposta_cache.get("resultados", [])
+                )
+                pergunta_id = gravar_pergunta(
                     cursor, empresa_id, usuario_id, entrada.pergunta,
-                    resposta_cache.get("metodo", "desconhecido"), True,
+                    resposta_cache.get("metodo", "desconhecido"), True, sem_resposta,
                 )
                 conexao.commit()
-                return {**resposta_cache, "veio_do_cache": True}
+                return {**resposta_cache, "id": pergunta_id, "veio_do_cache": True}
 
             metodo = "semantica"
             try:
@@ -58,16 +72,37 @@ def perguntar(entrada: PerguntaEntrada):
                 linhas = buscar_trechos_palavra_chave(cursor, entrada.pergunta, entrada.k * 3)
 
             resultados = montar_resultados(linhas, entrada.k)
+            sem_resposta = calcular_sem_resposta(metodo, resultados)
+
+            artigo_principal = None
+            if resultados:
+                artigo_principal = buscar_artigo_completo(cursor, resultados[0]["artigo_id"])
+
             saida = {
                 "pergunta": entrada.pergunta,
                 "metodo": metodo,
                 "veio_do_cache": False,
                 "explicacao": gerar_explicacao(entrada.pergunta, resultados),
+                "artigo_principal": artigo_principal,
                 "resultados": resultados,
             }
 
             gravar_cache(cursor, chave, saida)
-            gravar_pergunta(cursor, empresa_id, usuario_id, entrada.pergunta, metodo, False)
+            pergunta_id = gravar_pergunta(
+                cursor, empresa_id, usuario_id, entrada.pergunta, metodo, False, sem_resposta
+            )
             conexao.commit()
 
-            return saida
+            return {**saida, "id": pergunta_id}
+
+
+@roteador.post("/perguntar/{pergunta_id}/feedback")
+def feedback(pergunta_id: int, entrada: FeedbackEntrada):
+    pool = obter_pool()
+    with pool.connection() as conexao:
+        with conexao.cursor() as cursor:
+            encontrado = gravar_feedback(cursor, pergunta_id, entrada.util)
+            conexao.commit()
+    if not encontrado:
+        raise HTTPException(status_code=404, detail="pergunta nao encontrada")
+    return {"status": "ok"}

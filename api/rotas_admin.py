@@ -9,9 +9,9 @@ pendencia de proteger isso antes de expor publicamente.
 
 from fastapi import APIRouter
 
-from .banco import obter_pool
+from .banco import obter_metricas_satisfacao, obter_pool
 from .datadog_cliente import consultar_serie
-from .esquemas import MetricasSaida
+from .esquemas import MetricasSaida, MetricasSatisfacaoSaida
 
 roteador = APIRouter()
 
@@ -52,6 +52,15 @@ def metricas():
             ]
 
     return {"por_empresa": por_empresa, "por_usuario": por_usuario}
+
+
+@roteador.get("/admin/metricas-satisfacao", response_model=MetricasSatisfacaoSaida)
+def metricas_satisfacao():
+    """Quanto a IA resolveu sozinha, feedback dos usuarios e o que ficou sem resposta boa."""
+    pool = obter_pool()
+    with pool.connection() as conexao:
+        with conexao.cursor() as cursor:
+            return obter_metricas_satisfacao(cursor)
 
 
 @roteador.get("/admin/metricas-infra")

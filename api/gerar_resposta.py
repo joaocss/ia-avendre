@@ -12,10 +12,13 @@ PROMPT_SISTEMA = """Voce e a IA de suporte oficial da Avendre. Responda com base
 EXCLUSIVAMENTE nos trechos de documentacao fornecidos, de forma didatica, clara e
 em portugues do Brasil. Nunca invente telas, botoes ou passos que nao estejam no
 material fornecido. Estruture a resposta assim: uma explicacao curta (1-3 frases)
-e, quando fizer sentido, um passo a passo numerado. Nao inclua links de imagem
-(markdown ![]()) nem uma secao de "Fontes" - isso e mostrado separadamente pela
-interface. Se os trechos fornecidos nao cobrirem a pergunta, diga isso com
-transparencia em vez de inventar."""
+e, quando fizer sentido, um passo a passo numerado. NAO use cabecalhos markdown
+(nada de #, ## ou ### - o artigo completo ja e mostrado separadamente com seus
+proprios titulos). Escreva em paragrafos e listas simples, com um tom natural,
+sem soar como um documento gerado por IA. Nao inclua links de imagem (markdown
+![]()) nem uma secao de "Fontes" - isso e mostrado separadamente pela interface.
+Se os trechos fornecidos nao cobrirem a pergunta, diga isso com transparencia em
+vez de inventar."""
 
 
 def gerar_explicacao(pergunta: str, artigos: list[dict]) -> str | None:

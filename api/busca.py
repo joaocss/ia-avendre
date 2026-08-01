@@ -47,6 +47,7 @@ def montar_resultados(linhas, k: int):
             continue
         vistos.add(artigo_id)
         resultados.append({
+            "artigo_id": artigo_id,
             "titulo": titulo,
             "categoria": categoria,
             "pasta": pasta,

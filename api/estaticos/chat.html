@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>Suporte Avendre (teste)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
   :root {
     --roxo: #5b2a86;
@@ -86,7 +87,7 @@
     color: var(--roxo);
   }
 
-  /* explicacao gerada pela IA - card em destaque */
+  /* explicacao gerada pela IA */
   .explicacao {
     background: linear-gradient(180deg, #f4effb, #ffffff);
     border: 1px solid #d9cdf0;
@@ -99,34 +100,77 @@
     text-transform: uppercase; letter-spacing: .04em;
     margin-bottom: 10px;
   }
-  .explicacao-corpo { font-size: 15px; line-height: 1.65; }
-  .explicacao-corpo p { margin: 0 0 10px; }
-  .explicacao-corpo ol, .explicacao-corpo ul { margin: 0 0 10px; padding-left: 22px; }
-  .explicacao-corpo li { margin-bottom: 4px; }
-  .explicacao-corpo strong { color: var(--roxo); }
 
-  /* secao de fontes - artigos originais, mais discreta */
-  .fontes-titulo {
+  /* artigo principal - renderizado como no portal (marked.js) */
+  .artigo-principal {
+    background: var(--card);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+  .artigo-principal .fonte {
+    font-size: 12px; color: #8a8494; margin-bottom: 4px;
+  }
+  .artigo-principal .fonte a { color: var(--roxo); font-weight: 600; text-decoration: none; }
+
+  /* conteudo markdown renderizado (compartilhado entre explicacao e artigo) */
+  .md-conteudo h1, .md-conteudo h2, .md-conteudo h3 {
+    color: var(--roxo);
+    margin: 18px 0 8px;
+  }
+  .md-conteudo h1:first-child, .md-conteudo h2:first-child, .md-conteudo h3:first-child { margin-top: 0; }
+  .md-conteudo p { margin: 0 0 10px; line-height: 1.6; font-size: 14px; }
+  .md-conteudo ol, .md-conteudo ul { margin: 0 0 10px; padding-left: 22px; }
+  .md-conteudo li { margin-bottom: 6px; line-height: 1.5; font-size: 14px; }
+  .md-conteudo strong { color: var(--roxo); }
+  .md-conteudo hr { border: none; border-top: 1px solid var(--borda); margin: 16px 0; }
+  .md-conteudo img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--borda);
+    display: block;
+    margin: 10px 0;
+  }
+
+  /* artigos relacionados - lista compacta, so titulo + link */
+  .relacionados-titulo {
     font-size: 12px; font-weight: 700; color: #8a8494;
     text-transform: uppercase; letter-spacing: .04em;
     margin: 4px 2px;
   }
-  .artigo {
+  .relacionados { display: grid; gap: 8px; margin-top: 8px; }
+  .relacionados a {
+    display: block;
     background: var(--card);
     border: 1px solid var(--borda);
-    border-radius: 14px;
-    padding: 16px 18px;
-    margin-top: 10px;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--texto);
+    text-decoration: none;
   }
-  .artigo h3 { margin: 8px 0 4px; font-size: 15px; }
-  .artigo .meta { font-size: 12px; color: #8a8494; margin-bottom: 8px; }
-  .artigo p.trecho { font-size: 13px; line-height: 1.5; color: #4a4553; }
-  .artigo a { color: var(--roxo); font-weight: 600; text-decoration: none; font-size: 13px; }
-  .imagens { display: flex; gap: 8px; overflow-x: auto; margin-top: 8px; }
-  .imagens img {
-    max-height: 130px; width: auto; flex-shrink: 0;
-    border-radius: 8px; border: 1px solid var(--borda);
+  .relacionados a:hover { border-color: var(--roxo-claro); color: var(--roxo); }
+  .relacionados a .cat { display: block; font-size: 11px; font-weight: 700; color: var(--roxo); margin-bottom: 2px; }
+
+  /* feedback */
+  .feedback {
+    display: flex; align-items: center; gap: 10px;
+    justify-content: center;
+    padding: 6px 0 4px;
   }
+  .feedback span { font-size: 13px; color: #6b6575; }
+  .feedback button {
+    background: var(--card);
+    color: var(--texto);
+    border: 1px solid var(--borda);
+    padding: 8px 14px;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .feedback button:hover { background: #ece6f7; }
+  .feedback button.selecionado { background: var(--roxo); border-color: var(--roxo); }
 </style>
 </head>
 <body>
@@ -171,49 +215,38 @@ function escaparHtml(texto) {
   return div.innerHTML;
 }
 
-// limpa a sintaxe markdown do trecho literal do artigo (as imagens ja sao
-// mostradas separadamente na galeria, entao aqui so tiramos o "ruido")
-function limparTrecho(texto) {
-  return escaparHtml(texto)
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')       // remove imagens markdown
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')     // remove links, mantem o texto
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n{2,}/g, '</p><p>')
-    .replace(/\n/g, '<br>')
-    .trim();
+function renderizarMarkdown(texto) {
+  return marked.parse(texto || '');
 }
 
-// renderizacao simples do markdown que o modelo gera na explicacao (paragrafos,
-// negrito e listas numeradas/com marcadores)
-function renderizarMarkdownSimples(texto) {
-  const linhas = escaparHtml(texto).split('\n');
-  let html = '';
-  let dentroDeLista = null; // 'ol' | 'ul' | null
+function montarBlocoFeedback(perguntaId) {
+  const bloco = document.createElement('div');
+  bloco.className = 'feedback';
+  bloco.innerHTML = `
+    <span>Essa resposta ajudou?</span>
+    <button type="button" data-util="true" title="Ajudou">👍</button>
+    <button type="button" data-util="false" title="Nao ajudou">👎</button>
+  `;
 
-  const fecharLista = () => {
-    if (dentroDeLista) { html += `</${dentroDeLista}>`; dentroDeLista = null; }
-  };
+  bloco.querySelectorAll('button').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const util = btn.dataset.util === 'true';
+      bloco.querySelectorAll('button').forEach((b) => (b.disabled = true));
+      btn.classList.add('selecionado');
+      try {
+        await fetch(`/perguntar/${perguntaId}/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ util }),
+        });
+        bloco.querySelector('span').textContent = 'Obrigado pelo feedback!';
+      } catch {
+        bloco.querySelector('span').textContent = 'Nao foi possivel enviar o feedback agora.';
+      }
+    });
+  });
 
-  for (let linha of linhas) {
-    linha = linha.trim();
-    const itemNumerado = linha.match(/^\d+[.\)]\s+(.*)/);
-    const itemComMarcador = linha.match(/^[-*]\s+(.*)/);
-
-    if (itemNumerado) {
-      if (dentroDeLista !== 'ol') { fecharLista(); html += '<ol>'; dentroDeLista = 'ol'; }
-      html += `<li>${itemNumerado[1]}</li>`;
-    } else if (itemComMarcador) {
-      if (dentroDeLista !== 'ul') { fecharLista(); html += '<ul>'; dentroDeLista = 'ul'; }
-      html += `<li>${itemComMarcador[1]}</li>`;
-    } else if (linha === '') {
-      fecharLista();
-    } else {
-      fecharLista();
-      html += `<p>${linha}</p>`;
-    }
-  }
-  fecharLista();
-  return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  return bloco;
 }
 
 function renderizarResultados(dados) {
@@ -221,49 +254,62 @@ function renderizarResultados(dados) {
 
   const cabecalho = document.createElement('div');
   cabecalho.className = 'aviso';
-  cabecalho.innerHTML = `metodo: <span class="badge">${dados.metodo}</span> ${dados.veio_do_cache ? '<span class="badge">cache</span>' : ''}`;
-  resultadoEl.appendChild(cabecalho);
+  cabecalho.innerHTML = dados.veio_do_cache ? '<span class="badge">resposta em cache</span>' : '';
+  if (dados.veio_do_cache) resultadoEl.appendChild(cabecalho);
 
   if (dados.explicacao) {
     const explicacao = document.createElement('div');
     explicacao.className = 'explicacao';
     explicacao.innerHTML = `
       <div class="rotulo">Resposta da IA de suporte</div>
-      <div class="explicacao-corpo">${renderizarMarkdownSimples(dados.explicacao)}</div>
+      <div class="md-conteudo">${renderizarMarkdown(dados.explicacao)}</div>
     `;
     resultadoEl.appendChild(explicacao);
   }
 
-  if (!dados.resultados.length) {
+  if (dados.artigo_principal) {
+    const artigo = dados.artigo_principal;
+    const card = document.createElement('div');
+    card.className = 'artigo-principal';
+    card.innerHTML = `
+      <span class="badge">${escaparHtml(artigo.categoria)} / ${escaparHtml(artigo.pasta)}</span>
+      <div class="fonte" style="margin-top:8px;">
+        <a href="${artigo.url}" target="_blank" rel="noopener">${escaparHtml(artigo.titulo)} &rarr;</a>
+      </div>
+      <div class="md-conteudo">${renderizarMarkdown(artigo.conteudo_markdown)}</div>
+    `;
+    resultadoEl.appendChild(card);
+  }
+
+  if (!dados.artigo_principal && !dados.explicacao) {
     const vazio = document.createElement('div');
     vazio.className = 'aviso';
     vazio.textContent = 'Nao encontramos nenhum artigo relevante para essa pergunta na base.';
     resultadoEl.appendChild(vazio);
-    return;
   }
 
-  const tituloFontes = document.createElement('div');
-  tituloFontes.className = 'fontes-titulo';
-  tituloFontes.textContent = 'Fontes (artigos originais)';
-  resultadoEl.appendChild(tituloFontes);
+  const relacionados = (dados.resultados || []).slice(1); // o primeiro ja apareceu como artigo_principal
+  if (relacionados.length) {
+    const titulo = document.createElement('div');
+    titulo.className = 'relacionados-titulo';
+    titulo.textContent = 'Artigos relacionados';
+    resultadoEl.appendChild(titulo);
 
-  for (const r of dados.resultados) {
-    const card = document.createElement('div');
-    card.className = 'artigo';
+    const lista = document.createElement('div');
+    lista.className = 'relacionados';
+    for (const r of relacionados) {
+      const link = document.createElement('a');
+      link.href = r.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.innerHTML = `<span class="cat">${escaparHtml(r.categoria)} / ${escaparHtml(r.pasta)}</span>${escaparHtml(r.titulo)}`;
+      lista.appendChild(link);
+    }
+    resultadoEl.appendChild(lista);
+  }
 
-    const imagensHtml = (r.imagens || []).slice(0, 4).map(
-      src => `<img src="${src}" alt="tela ilustrativa">`
-    ).join('');
-
-    card.innerHTML = `
-      <span class="badge">${escaparHtml(r.categoria)} / ${escaparHtml(r.pasta)}</span>
-      <h3>${escaparHtml(r.titulo)}</h3>
-      <div class="meta">score: ${r.score}</div>
-      <p class="trecho">${limparTrecho(r.trecho)}</p>
-      ${imagensHtml ? `<div class="imagens">${imagensHtml}</div>` : ''}
-      <p><a href="${r.url}" target="_blank" rel="noopener">Ver artigo completo &rarr;</a></p>
-    `;
-    resultadoEl.appendChild(card);
+  if (dados.id) {
+    resultadoEl.appendChild(montarBlocoFeedback(dados.id));
   }
 }
 
